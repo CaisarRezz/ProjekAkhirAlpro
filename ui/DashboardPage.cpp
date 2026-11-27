@@ -1,5 +1,6 @@
 #include "DashboardPage.h"
 #include "ui_DashboardPage.h"
+#include "inventorymanager.h"
 
 #include <QColor>
 #include <QHBoxLayout>
@@ -9,7 +10,6 @@
 #include <QPainterPath>
 #include <QPixmap>
 #include <QTableWidgetItem>
-#include <algorithm>
 
 namespace {
 
@@ -79,10 +79,10 @@ QString formatQuantity(double quantity, const QString &unit)
     return QStringLiteral("%1 %2").arg(qtyStr, unit.trimmed());
 }
 
-QString formatExpirationLabel(const QDate &expirationDate, const QDate &today)
+QString formatExpirationLabel(const ExpirationRecord &record)
 {
-    const QString dateStr = expirationDate.toString(QStringLiteral("MMM d, yyyy"));
-    const qint64 daysLeft = today.daysTo(expirationDate);
+    const QString dateStr = record.expirationDate.toString(QStringLiteral("MMM d, yyyy"));
+    const int daysLeft = record.remainingDays;
 
     if (daysLeft < 0) {
         return QStringLiteral("%1 (%2d overdue)").arg(dateStr).arg(-daysLeft);
@@ -110,9 +110,6 @@ DashboardPage::DashboardPage(QWidget *parent)
 
     connect(ui->btnViewInventory, &QPushButton::clicked,
             this, &DashboardPage::viewInventoryRequested);
-
-    // Temporary sample data until InventoryManager is integrated.
-    loadSampleData();
 }
 
 DashboardPage::~DashboardPage()
@@ -120,25 +117,77 @@ DashboardPage::~DashboardPage()
     delete ui;
 }
 
-void DashboardPage::setFoodItems(const QList<DashboardFoodItem> &items)
+void DashboardPage::setInventoryManager(InventoryManager *manager)
 {
-    m_items = items;
-    refreshDashboard();
+    if (m_inventoryManager == manager) {
+        refreshData();
+        return;
+    }
+
+    if (m_inventoryManager) {
+        disconnect(m_inventoryManager, &InventoryManager::inventoryChanged,
+                   this, &DashboardPage::refreshData);
+    }
+
+    m_inventoryManager = manager;
+
+    if (m_inventoryManager) {
+        connect(m_inventoryManager, &InventoryManager::inventoryChanged,
+                this, &DashboardPage::refreshData);
+    }
+
+    refreshData();
 }
 
-ExpirationStatus DashboardPage::calculateStatus(const QDate &expirationDate, const QDate &today)
+void DashboardPage::refreshData()
 {
-    const qint64 daysLeft = today.daysTo(expirationDate);
-    if (daysLeft < 0) {
-        return ExpirationStatus::Expired;
+    if (!m_inventoryManager) {
+        refreshFromItems({});
+        return;
     }
-    if (daysLeft <= 2) {
-        return ExpirationStatus::Critical;
+
+    refreshFromItems(m_inventoryManager->getAllItems());
+}
+
+void DashboardPage::refreshFromItems(const QVector<FoodItem> &items)
+{
+    const int totalItems = static_cast<int>(items.size());
+    const int availableStock = ExpirationChecker::getAvailableStockCount(items);
+    const int expiringSoon = static_cast<int>(ExpirationChecker::getExpiringSoonItems(items).size());
+    const int expiredItems = static_cast<int>(ExpirationChecker::getExpiredItems(items).size());
+
+    ui->lblTotalValue->setText(QString::number(totalItems));
+    ui->lblAvailableValue->setText(QString::number(availableStock));
+    ui->lblExpiringSoonValue->setText(QString::number(expiringSoon));
+    ui->lblExpiredValue->setText(QString::number(expiredItems));
+
+    const QVector<ExpirationRecord> attentionItems = ExpirationChecker::getAttentionItems(items, 5);
+    const int rowCount = static_cast<int>(attentionItems.size());
+
+    ui->attentionTable->clearContents();
+    ui->attentionTable->setRowCount(rowCount);
+
+    for (int row = 0; row < rowCount; ++row) {
+        const ExpirationRecord &record = attentionItems.at(row);
+
+        auto *nameItem = new QTableWidgetItem(record.name);
+        QFont nameFont = nameItem->font();
+        nameFont.setWeight(QFont::DemiBold);
+        nameItem->setFont(nameFont);
+        nameItem->setForeground(QColor("#111827"));
+
+        auto *qtyItem = new QTableWidgetItem(formatQuantity(record.quantity, record.unit));
+        qtyItem->setForeground(QColor("#4B5563"));
+
+        auto *dateItem = new QTableWidgetItem(formatExpirationLabel(record));
+        dateItem->setForeground(record.status == ExpirationStatus::Expired ? QColor("#B91C1C")
+                                                                           : QColor("#4B5563"));
+
+        ui->attentionTable->setItem(row, 0, nameItem);
+        ui->attentionTable->setItem(row, 1, qtyItem);
+        ui->attentionTable->setItem(row, 2, dateItem);
+        ui->attentionTable->setCellWidget(row, 3, createStatusBadge(record.status));
     }
-    if (daysLeft <= 7) {
-        return ExpirationStatus::Warning;
-    }
-    return ExpirationStatus::Safe;
 }
 
 void DashboardPage::setupCardIcons()
@@ -168,117 +217,30 @@ void DashboardPage::setupTable()
     ui->attentionTable->setColumnWidth(3, 130);
 }
 
-void DashboardPage::loadSampleData()
-{
-    const QDate today = QDate::currentDate();
-    const QList<DashboardFoodItem> sampleItems = {
-        {QStringLiteral("Fresh Milk"), 1.0, QStringLiteral("L"), today.addDays(-2)},
-        {QStringLiteral("Baby Spinach"), 200.0, QStringLiteral("g"), today},
-        {QStringLiteral("Greek Yogurt"), 2.0, QStringLiteral("cups"), today.addDays(2)},
-        {QStringLiteral("Chicken Breast"), 500.0, QStringLiteral("g"), today.addDays(5)},
-        {QStringLiteral("Cheddar Cheese"), 250.0, QStringLiteral("g"), today.addDays(6)},
-        {QStringLiteral("Free-Range Eggs"), 12.0, QStringLiteral("pcs"), today.addDays(12)},
-        {QStringLiteral("Brown Rice"), 2.0, QStringLiteral("kg"), today.addDays(45)}
-    };
-
-    setFoodItems(sampleItems);
-}
-
-void DashboardPage::refreshDashboard()
-{
-    const QDate today = QDate::currentDate();
-
-    const int totalItems = static_cast<int>(m_items.size());
-    int availableStock = 0;
-    int expiringSoon = 0;
-    int expiredItems = 0;
-
-    for (const DashboardFoodItem &item : m_items) {
-        const ExpirationStatus status = calculateStatus(item.expirationDate, today);
-        if (status == ExpirationStatus::Expired) {
-            ++expiredItems;
-        } else {
-            // Count non-expired records rather than summing incompatible units.
-            ++availableStock;
-            if (status == ExpirationStatus::Critical || status == ExpirationStatus::Warning) {
-                ++expiringSoon;
-            }
-        }
-    }
-
-    ui->lblTotalValue->setText(QString::number(totalItems));
-    ui->lblAvailableValue->setText(QString::number(availableStock));
-    ui->lblExpiringSoonValue->setText(QString::number(expiringSoon));
-    ui->lblExpiredValue->setText(QString::number(expiredItems));
-
-    // Sort by earliest expiration date first so expired and soon-to-expire items lead.
-    QList<DashboardFoodItem> sortedItems = m_items;
-    std::sort(sortedItems.begin(), sortedItems.end(),
-              [](const DashboardFoodItem &a, const DashboardFoodItem &b) {
-                  if (a.expirationDate != b.expirationDate) {
-                      return a.expirationDate < b.expirationDate;
-                  }
-                  return a.name.compare(b.name, Qt::CaseInsensitive) < 0;
-              });
-
-    constexpr int maxDisplayedRows = 5;
-    const int rowCount = std::min<int>(static_cast<int>(sortedItems.size()), maxDisplayedRows);
-
-    ui->attentionTable->clearContents();
-    ui->attentionTable->setRowCount(rowCount);
-
-    for (int row = 0; row < rowCount; ++row) {
-        const DashboardFoodItem &item = sortedItems.at(row);
-        const ExpirationStatus status = calculateStatus(item.expirationDate, today);
-
-        auto *nameItem = new QTableWidgetItem(item.name);
-        QFont nameFont = nameItem->font();
-        nameFont.setWeight(QFont::DemiBold);
-        nameItem->setFont(nameFont);
-        nameItem->setForeground(QColor("#111827"));
-
-        auto *qtyItem = new QTableWidgetItem(formatQuantity(item.quantity, item.unit));
-        qtyItem->setForeground(QColor("#4B5563"));
-
-        auto *dateItem = new QTableWidgetItem(formatExpirationLabel(item.expirationDate, today));
-        dateItem->setForeground(status == ExpirationStatus::Expired ? QColor("#B91C1C")
-                                                                  : QColor("#4B5563"));
-
-        ui->attentionTable->setItem(row, 0, nameItem);
-        ui->attentionTable->setItem(row, 1, qtyItem);
-        ui->attentionTable->setItem(row, 2, dateItem);
-        ui->attentionTable->setCellWidget(row, 3, createStatusBadge(status));
-    }
-}
-
 QWidget *DashboardPage::createStatusBadge(ExpirationStatus status) const
 {
-    QString text;
+    const QString text = ExpirationChecker::statusToString(status);
     QString textColor;
     QString bgColor;
     QString borderColor;
 
     switch (status) {
     case ExpirationStatus::Expired:
-        text = QStringLiteral("Expired");
         textColor = QStringLiteral("#B91C1C");
         bgColor = QStringLiteral("#FEE2E2");
         borderColor = QStringLiteral("#FCA5A5");
         break;
     case ExpirationStatus::Critical:
-        text = QStringLiteral("Critical");
         textColor = QStringLiteral("#C2410C");
         bgColor = QStringLiteral("#FFEDD5");
         borderColor = QStringLiteral("#FDBA74");
         break;
     case ExpirationStatus::Warning:
-        text = QStringLiteral("Warning");
         textColor = QStringLiteral("#A16207");
         bgColor = QStringLiteral("#FEF9C3");
         borderColor = QStringLiteral("#FDE047");
         break;
     case ExpirationStatus::Safe:
-        text = QStringLiteral("Safe");
         textColor = QStringLiteral("#15803D");
         bgColor = QStringLiteral("#DCFCE7");
         borderColor = QStringLiteral("#86EFAC");

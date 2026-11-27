@@ -1,36 +1,17 @@
 #ifndef DASHBOARDPAGE_H
 #define DASHBOARDPAGE_H
 
-#include <QDate>
-#include <QList>
-#include <QString>
+#include "expirationchecker.h"
+#include "models/FoodItem.h"
+
+#include <QVector>
 #include <QWidget>
+
+class InventoryManager;
 
 namespace Ui {
 class DashboardPage;
 }
-
-/**
- * @brief Lightweight item view model used by DashboardPage.
- *
- * Designed so InventoryManager records can be mapped directly into
- * DashboardPage::setFoodItems() once the backend is connected.
- */
-struct DashboardFoodItem
-{
-    QString name;
-    double quantity = 0.0;
-    QString unit;
-    QDate expirationDate;
-};
-
-enum class ExpirationStatus
-{
-    Expired,
-    Critical,
-    Warning,
-    Safe
-};
 
 /**
  * @brief Dashboard overview page displaying summary statistics and urgent items.
@@ -44,15 +25,20 @@ public:
     ~DashboardPage() override;
 
     /**
-     * @brief Replaces displayed food items and recalculates dashboard statistics and table.
+     * @brief Connects the dashboard to an InventoryManager instance for live updates.
      */
-    void setFoodItems(const QList<DashboardFoodItem> &items);
+    void setInventoryManager(InventoryManager *manager);
 
     /**
-     * @brief Computes expiration status from an expiration date relative to today.
+     * @brief Updates summary cards and attention table from the provided inventory records.
      */
-    static ExpirationStatus calculateStatus(const QDate &expirationDate,
-                                            const QDate &today = QDate::currentDate());
+    void refreshFromItems(const QVector<FoodItem> &items);
+
+public slots:
+    /**
+     * @brief Reloads dashboard data from the connected InventoryManager.
+     */
+    void refreshData();
 
 signals:
     void viewInventoryRequested();
@@ -61,12 +47,10 @@ private:
     void setupCardIcons();
     void setupTable();
     void applyStyles();
-    void loadSampleData();
-    void refreshDashboard();
     QWidget *createStatusBadge(ExpirationStatus status) const;
 
     Ui::DashboardPage *ui;
-    QList<DashboardFoodItem> m_items;
+    InventoryManager *m_inventoryManager = nullptr;
 };
 
 #endif // DASHBOARDPAGE_H

@@ -1,10 +1,12 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include "DashboardPage.h"
+#include "inventorymanager.h"
 
 #include <QButtonGroup>
 #include <QDate>
 #include <QIcon>
+#include <QMessageBox>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPixmap>
@@ -101,6 +103,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+InventoryManager *MainWindow::inventoryManager() const
+{
+    return m_inventoryManager;
+}
+
 void MainWindow::setupSidebar()
 {
     ui->logoBadgeLabel->setPixmap(renderVectorIcon(NavIconType::Logo, Qt::white, 22));
@@ -131,7 +138,16 @@ void MainWindow::setupHeader()
 
 void MainWindow::setupPages()
 {
+    m_inventoryManager = new InventoryManager(QString(), this);
+    const InventoryResult loadResult = m_inventoryManager->load();
+    if (!loadResult.success) {
+        QMessageBox::warning(this,
+                             QStringLiteral("FreshGuard - Storage Error"),
+                             loadResult.message);
+    }
+
     m_dashboardPage = new DashboardPage(this);
+    m_dashboardPage->setInventoryManager(m_inventoryManager);
     ui->dashboardContainerLayout->addWidget(m_dashboardPage);
 
     connect(m_dashboardPage, &DashboardPage::viewInventoryRequested, this, [this]() {
