@@ -5,7 +5,7 @@
 
 class QButtonGroup;
 class DashboardPage;
-class InventoryManager;
+class InventoryPage;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -23,8 +23,6 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
-
-    InventoryManager *inventoryManager() const;
 
 private slots:
     void navigateToPage(int index);
@@ -44,8 +42,8 @@ private:
 
     Ui::MainWindow *ui;
     QButtonGroup *m_navGroup = nullptr;
-    InventoryManager *m_inventoryManager = nullptr;
     DashboardPage *m_dashboardPage = nullptr;
+    InventoryPage *m_inventoryPage = nullptr;
 };
 
 #endif // MAINWINDOW_H

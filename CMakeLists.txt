@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.16)
 
 project(ProjekAkhirAlpro VERSION 0.1 LANGUAGES CXX)
@@ -13,6 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 qt_standard_project_setup()
+
 
 qt_add_executable(ProjekAkhirAlpro
     main.cpp
@@ -29,14 +29,21 @@ qt_add_executable(ProjekAkhirAlpro
 
     ui/MainWindow.h
     ui/MainWindow.cpp
-    ui/MainWindow.ui
+    ui/mainwindow.ui
 
     ui/DashboardPage.h
     ui/DashboardPage.cpp
     ui/DashboardPage.ui
 
     ui/ExpirationPage.ui
+
+    ui/InventoryPage.h
+    ui/InventoryPage.cpp
     ui/InventoryPage.ui
+
+    ui/addfooddialog.h
+    ui/addfooddialog.cpp
+    ui/addfooddialog.ui
 )
 
 target_include_directories(ProjekAkhirAlpro PRIVATE

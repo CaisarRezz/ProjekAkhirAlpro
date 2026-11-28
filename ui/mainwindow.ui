@@ -328,7 +328,7 @@
        <item>
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="pageDashboardContainer">
           <layout class="QVBoxLayout" name="dashboardContainerLayout">
@@ -348,67 +348,26 @@
             <number>0</number>
            </property>
           </layout>
-         </widget>
-         <widget class="QWidget" name="pageInventoryPlaceholder">
-          <layout class="QVBoxLayout" name="inventoryPlaceholderLayout">
-           <property name="leftMargin">
-            <number>28</number>
-           </property>
-           <property name="topMargin">
-            <number>24</number>
-           </property>
-           <property name="rightMargin">
-            <number>28</number>
-           </property>
-           <property name="bottomMargin">
-            <number>24</number>
-           </property>
-           <item>
-            <widget class="QFrame" name="inventoryPlaceholderCard">
-             <property name="frameShape">
-              <enum>QFrame::Shape::NoFrame</enum>
-             </property>
-             <layout class="QVBoxLayout" name="inventoryCardLayout">
-              <property name="spacing">
-               <number>8</number>
-              </property>
-              <property name="leftMargin">
-               <number>32</number>
-              </property>
-              <property name="topMargin">
-               <number>40</number>
-              </property>
-              <property name="rightMargin">
-               <number>32</number>
-              </property>
-              <property name="bottomMargin">
-               <number>40</number>
-              </property>
-              <item>
-               <widget class="QLabel" name="inventoryPlaceholderTitle">
-                <property name="text">
-                 <string>Inventory</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="inventoryPlaceholderDesc">
-                <property name="text">
-                 <string>Inventory management view will be implemented here.</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
+         </widget>        
+<widget class="QWidget" name="pageInventoryPlaceholder">
+ <layout class="QVBoxLayout" name="inventoryPageContainerLayout">
+  <property name="spacing">
+   <number>0</number>
+  </property>
+  <property name="leftMargin">
+   <number>0</number>
+  </property>
+  <property name="topMargin">
+   <number>0</number>
+  </property>
+  <property name="rightMargin">
+   <number>0</number>
+  </property>
+  <property name="bottomMargin">
+   <number>0</number>
+  </property>
+ </layout>
+</widget>
          <widget class="QWidget" name="pageExpirationPlaceholder">
           <layout class="QVBoxLayout" name="expirationPlaceholderLayout">
            <property name="leftMargin">

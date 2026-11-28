@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AddFoodDialog</class>
+ <widget class="QDialog" name="AddFoodDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>540</width>
+    <height>560</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Add Food</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog {
+    background-color: #FFFFFF;
+    font-family: "Segoe UI", "Inter", sans-serif;
+}
+
+QLabel {
+    color: #1F2937;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QLabel#lblDialogTitle {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+QLabel#lblDialogSubtitle {
+    font-size: 14px;
+    font-weight: 400;
+    color: #6B7280;
+}
+
+QPushButton#btnClose {
+    background: transparent;
+    border: none;
+    color: #6B7280;
+    font-size: 16px;
+    border-radius: 6px;
+}
+
+QPushButton#btnClose:hover {
+    background-color: #F3F4F6;
+    color: #111827;
+}
+
+QFrame#lineTop, QFrame#lineBottom {
+    color: #E5E7EB;
+    background-color: #E5E7EB;
+    max-height: 1px;
+    border: none;
+}
+
+QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QDateEdit {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 8px 12px;
+    min-height: 24px;
+    font-size: 14px;
+    color: #111827;
+}
+
+QLineEdit:focus,
+QComboBox:focus,
+QSpinBox:focus,
+QDoubleSpinBox:focus,
+QDateEdit:focus {
+    border: 1.5px solid #2E8B57;
+}
+
+QComboBox::drop-down, QDateEdit::drop-down {
+    border: none;
+    width: 28px;
+}
+
+QFrame#infoBanner {
+    background-color: #F3F5F4;
+    border-radius: 8px;
+}
+
+QLabel#lblInfoIcon {
+    color: #2E8B57;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+QLabel#lblInfoText {
+    color: #6B7280;
+    font-size: 13px;
+    font-weight: 400;
+}
+
+QPushButton#btnCancel {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    color: #111827;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 24px;
+    min-height: 26px;
+}
+
+QPushButton#btnCancel:hover {
+    background-color: #F9FAFB;
+}
+
+QPushButton#btnAddFood {
+    background-color: #2E8B57;
+    border: none;
+    border-radius: 8px;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 28px;
+    min-height: 26px;
+}
+
+QPushButton#btnAddFood:hover {
+    background-color: #257347;
+}
+
+QPushButton#btnAddFood:pressed {
+    background-color: #1E5E3A;
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QWidget" name="headerWidget" native="true">
+     <layout class="QHBoxLayout" name="headerLayout">
+      <property name="leftMargin">
+       <number>24</number>
+      </property>
+      <property name="topMargin">
+       <number>20</number>
+      </property>
+      <property name="rightMargin">
+       <number>24</number>
+      </property>
+      <property name="bottomMargin">
+       <number>20</number>
+      </property>
+      <item>
+       <layout class="QVBoxLayout" name="titleLayout">
+        <property name="spacing">
+         <number>4</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="lblDialogTitle">
+          <property name="text">
+           <string>Add Food</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblDialogSubtitle">
+          <property name="text">
+           <string>Add something fresh to your household inventory.</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="headerSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item alignment="Qt::AlignmentFlag::AlignTop">
+       <widget class="QPushButton" name="btnClose">
+        <property name="minimumSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>✕</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="lineTop">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="bodyWidget" native="true">
+     <layout class="QVBoxLayout" name="bodyLayout">
+      <property name="spacing">
+       <number>18</number>
+      </property>
+      <property name="leftMargin">
+       <number>24</number>
+      </property>
+      <property name="topMargin">
+       <number>22</number>
+      </property>
+      <property name="rightMargin">
+       <number>24</number>
+      </property>
+      <property name="bottomMargin">
+       <number>22</number>
+      </property>
+      <item>
+       <layout class="QVBoxLayout" name="foodNameGroup">
+        <property name="spacing">
+         <number>8</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="lblFoodName">
+          <property name="text">
+           <string>Food Name</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="inputFoodName">
+          <property name="placeholderText">
+           <string>e.g. Cherry tomatoes</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="middleRowLayout" stretch="2,1,1">
+        <property name="spacing">
+         <number>16</number>
+        </property>
+        <item>
+         <layout class="QVBoxLayout" name="categoryGroup">
+          <property name="spacing">
+           <number>8</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="lblCategory">
+            <property name="text">
+             <string>Category</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboCategory">
+            <property name="placeholderText">
+             <string>Select category</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="quantityGroup">
+          <property name="spacing">
+           <number>8</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="lblQuantity">
+            <property name="text">
+             <string>Quantity</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="spinQuantity">
+ <property name="buttonSymbols">
+  <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+ </property>
+ <property name="minimum">
+  <double>0.01</double>
+ </property>
+ <property name="maximum">
+  <double>9999.00</double>
+ </property>
+ <property name="decimals">
+  <number>2</number>
+ </property>
+ <property name="value">
+  <double>1.00</double>
+ </property>
+</widget>
+
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="unitGroup">
+          <property name="spacing">
+           <number>8</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="lblUnit">
+            <property name="text">
+             <string>Unit</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboUnit">
+            <property name="placeholderText">
+             <string>Select unit</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="dateRowLayout" stretch="1,1">
+        <property name="spacing">
+         <number>16</number>
+        </property>
+        <item>
+         <layout class="QVBoxLayout" name="purchaseDateGroup">
+          <property name="spacing">
+           <number>8</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="lblPurchaseDate">
+            <property name="text">
+             <string>Purchase Date</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDateEdit" name="datePurchase">
+            <property name="displayFormat">
+             <string>MMM dd, yyyy</string>
+            </property>
+            <property name="calendarPopup">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="expirationDateGroup">
+          <property name="spacing">
+           <number>8</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="lblExpirationDate">
+            <property name="text">
+             <string>Expiration Date</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDateEdit" name="dateExpiration">
+            <property name="displayFormat">
+             <string>MMM dd, yyyy</string>
+            </property>
+            <property name="calendarPopup">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QFrame" name="infoBanner">
+        <property name="frameShape">
+         <enum>QFrame::Shape::NoFrame</enum>
+        </property>
+        <layout class="QHBoxLayout" name="bannerLayout">
+         <property name="spacing">
+          <number>10</number>
+         </property>
+         <property name="leftMargin">
+          <number>14</number>
+         </property>
+         <property name="topMargin">
+          <number>12</number>
+         </property>
+         <property name="rightMargin">
+          <number>14</number>
+         </property>
+         <property name="bottomMargin">
+          <number>12</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lblInfoIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>ⓘ</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblInfoText">
+           <property name="text">
+            <string>Expiration dates help you know what to use first.</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>10</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="lineBottom">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="footerWidget" native="true">
+     <layout class="QHBoxLayout" name="footerLayout">
+      <property name="spacing">
+       <number>12</number>
+      </property>
+      <property name="leftMargin">
+       <number>24</number>
+      </property>
+      <property name="topMargin">
+       <number>16</number>
+      </property>
+      <property name="rightMargin">
+       <number>24</number>
+      </property>
+      <property name="bottomMargin">
+       <number>16</number>
+      </property>
+      <item>
+       <spacer name="footerSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnCancel">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>Cancel</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnAddFood">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>Add Food</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
