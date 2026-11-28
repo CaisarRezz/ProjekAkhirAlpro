@@ -1,15 +1,16 @@
 #include "MainWindow.h"
-#include "ui_MainWindow.h"
+#include "ui_mainwindow.h"
 #include "DashboardPage.h"
-#include "inventorymanager.h"
+#include "InventoryPage.h"
 
 #include <QButtonGroup>
 #include <QDate>
 #include <QIcon>
-#include <QMessageBox>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPixmap>
+#include <QAbstractButton>
+#include <QSize>
 
 namespace {
 
@@ -75,8 +76,21 @@ QPixmap renderVectorIcon(NavIconType type, const QColor &color, int size)
 QIcon makeNavIcon(NavIconType type)
 {
     QIcon icon;
-    icon.addPixmap(renderVectorIcon(type, QColor("#4B5563"), 18), QIcon::Normal, QIcon::Off);
-    icon.addPixmap(renderVectorIcon(type, QColor("#2E8B57"), 18), QIcon::Normal, QIcon::On);
+
+    // Warna ikon normal
+    icon.addPixmap(
+        renderVectorIcon(type, QColor(75, 85, 99), 18),
+        QIcon::Normal,
+        QIcon::Off
+        );
+
+    // Warna ikon ketika aktif
+    icon.addPixmap(
+        renderVectorIcon(type, QColor(46, 139, 87), 18),
+        QIcon::Normal,
+        QIcon::On
+        );
+
     return icon;
 }
 
@@ -101,11 +115,6 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-InventoryManager *MainWindow::inventoryManager() const
-{
-    return m_inventoryManager;
 }
 
 void MainWindow::setupSidebar()
@@ -138,35 +147,29 @@ void MainWindow::setupHeader()
 
 void MainWindow::setupPages()
 {
-    m_inventoryManager = new InventoryManager(QString(), this);
-    const InventoryResult loadResult = m_inventoryManager->load();
-    if (!loadResult.success) {
-        QMessageBox::warning(this,
-                             QStringLiteral("FreshGuard - Storage Error"),
-                             loadResult.message);
-    }
-
     m_dashboardPage = new DashboardPage(this);
-    m_dashboardPage->setInventoryManager(m_inventoryManager);
     ui->dashboardContainerLayout->addWidget(m_dashboardPage);
 
-    connect(m_dashboardPage, &DashboardPage::viewInventoryRequested, this, [this]() {
-        navigateToPage(InventoryIndex);
-    });
+    m_inventoryPage = new InventoryPage(this);
+    ui->inventoryPageContainerLayout->addWidget(m_inventoryPage);
+
+    connect(m_dashboardPage, &DashboardPage::viewInventoryRequested,
+            this, [this]() {
+                navigateToPage(InventoryIndex);
+            });
 }
 
 void MainWindow::navigateToPage(int index)
 {
-    if (index < 0 || index >= ui->stackedWidget->count()) {
-        return;
-    }
-
+    // Pindah ke halaman yang dipilih
     ui->stackedWidget->setCurrentIndex(index);
 
+    // Mengaktifkan tombol navigasi yang sesuai
     if (QAbstractButton *button = m_navGroup->button(index)) {
         button->setChecked(true);
     }
 
+    // Memperbarui breadcrumb
     updateBreadcrumb(index);
 }
 
@@ -186,8 +189,7 @@ void MainWindow::updateBreadcrumb(int index)
             .arg(pageName));
 }
 
-void MainWindow::applyStyles()
-{
+void MainWindow::applyStyles(){
     setStyleSheet(QStringLiteral(R"(
         QMainWindow {
             background-color: #F8FAFC;
@@ -264,22 +266,21 @@ void MainWindow::applyStyles()
             font-weight: 500;
             color: #374151;
         }
-        QFrame#inventoryPlaceholderCard,
-        QFrame#expirationPlaceholderCard {
-            background-color: #FFFFFF;
-            border: 1px solid #E5E7EB;
-            border-radius: 12px;
-        }
-        QLabel#inventoryPlaceholderTitle,
-        QLabel#expirationPlaceholderTitle {
-            font-size: 20px;
-            font-weight: 700;
-            color: #111827;
-        }
-        QLabel#inventoryPlaceholderDesc,
-        QLabel#expirationPlaceholderDesc {
-            font-size: 13px;
-            color: #6B7280;
-        }
+QFrame#expirationPlaceholderCard {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+}
+
+QLabel#expirationPlaceholderTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+}
+
+QLabel#expirationPlaceholderDesc {
+    font-size: 13px;
+    color: #6B7280;
+}
     )"));
 }
